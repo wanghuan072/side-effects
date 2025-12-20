@@ -1,31 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm install",
-  "outputDirectory": ".",
-  "routes": [
-    {
-      "src": "/Build/(.*)",
-      "dest": "/404"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ],
   "headers": [
-    {
-      "source": "/Build/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, OPTIONS"
-        }
-      ]
-    },
     {
       "source": "/(.*\\.(wasm|data|js))",
       "headers": [
