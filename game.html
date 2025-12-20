@@ -135,10 +135,36 @@
           return;
         }
         console.log('[Game] Creating Unity instance...');
+        
+        // 设置超时检测
+        let progressTimeout;
+        let lastProgress = 0;
+        const progressTimeoutDuration = 30000; // 30秒超时
+        
+        const resetProgressTimeout = () => {
+          if (progressTimeout) {
+            clearTimeout(progressTimeout);
+          }
+          progressTimeout = setTimeout(() => {
+            if (lastProgress < 1) {
+              console.error('[Game] Loading timeout at', (lastProgress * 100).toFixed(1) + '%');
+              unityShowBanner('Game loading timeout. Please check your network connection and try again.', 'error');
+              loadingBar.style.display = "none";
+            }
+          }, progressTimeoutDuration);
+        };
+        
+        resetProgressTimeout();
+        
         createUnityInstance(canvas, config, (progress) => {
+          lastProgress = progress;
           progressBarFull.style.width = 100 * progress + "%";
           console.log('[Game] Loading progress:', (progress * 100).toFixed(1) + '%');
+          resetProgressTimeout();
         }).then((unityInstance) => {
+          if (progressTimeout) {
+            clearTimeout(progressTimeout);
+          }
           console.log('[Game] Unity instance created successfully');
           loadingBar.style.display = "none";
           
@@ -202,8 +228,28 @@
             clearInterval(buttonCheckInterval);
           }, 500); // Check every 500ms
         }).catch((message) => {
+          if (progressTimeout) {
+            clearTimeout(progressTimeout);
+          }
           console.error('[Game] Unity instance creation failed:', message);
-          unityShowBanner('Failed to create Unity instance: ' + message, 'error');
+          console.error('[Game] Error details:', {
+            message: message,
+            config: config,
+            loaderUrl: loaderUrl
+          });
+          
+          // 检查是否是 CORS 或网络错误
+          if (typeof message === 'string') {
+            if (message.includes('CORS') || message.includes('cross-origin')) {
+              unityShowBanner('CORS error: Blob Storage files may need CORS configuration.', 'error');
+            } else if (message.includes('network') || message.includes('fetch')) {
+              unityShowBanner('Network error: Failed to load game files. Please check your connection.', 'error');
+            } else {
+              unityShowBanner('Failed to create Unity instance: ' + message, 'error');
+            }
+          } else {
+            unityShowBanner('Failed to create Unity instance. Please check the console for details.', 'error');
+          }
           loadingBar.style.display = "none";
         });
       };
