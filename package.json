@@ -1,0 +1,17 @@
+{
+  "name": "side-effects-game",
+  "version": "0.2.0",
+  "description": "Side Effects Unity WebGL Game",
+  "type": "module",
+  "scripts": {
+    "upload-build": "node scripts/upload-build.js",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@vercel/blob": "^0.19.0"
+  },
+  "devDependencies": {
+    "vercel": "^38.0.0"
+  }
+}
+

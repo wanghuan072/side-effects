@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="user-scalable=yes, initial-scale=1, minimum-scale=1, maximum-scale=10, width=device-width" />
+<title>Side Effects - Play Local</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f0f0f0;
+}
+.main {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+.Gside {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.border {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+    padding: 15px;
+}
+#bgame {
+    text-align: center;
+}
+#game {
+    margin: 0 auto;
+}
+#loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+#playGame {
+    position: relative;
+}
+#playGame img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+.play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.playBT {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.playBT:hover {
+    background-color: #45a049;
+}
+.gamebar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+}
+.gameopt, .gamesize, .gamerate {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.gamescore {
+    font-weight: bold;
+    color: #4CAF50;
+    font-size: 18px;
+}
+.gameinfos {
+    text-align: left;
+}
+.gameinfo h1 {
+    margin-top: 0;
+    color: #333;
+}
+.gamemore {
+    display: block;
+    margin-bottom: 15px;
+    color: #666;
+    font-size: 14px;
+}
+.gamedesc {
+    line-height: 1.6;
+    color: #333;
+}
+.gametags {
+    margin-top: 15px;
+}
+.gametags a {
+    display: inline-block;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    padding: 5px 10px;
+    background-color: #f0f0f0;
+    color: #333;
+    text-decoration: none;
+    border-radius: 3px;
+    font-size: 12px;
+}
+.gametags a:hover {
+    background-color: #e0e0e0;
+}
+</style>
+</head>
+<body>
+<div class="main">
+  <div class="Gside">
+    <div id="bgame" class="border">
+      <div id="game" style="width:990px; height:560px;display:none;"><iframe title="game" id="embed" src="about:blank" style="width:100%; height:100%; border: none;" allow="autoplay" scrolling="no" allowfullscreen></iframe></div>
+      <div id="loader" class="preview">
+        <div id="playGame">
+          <div class="play">
+            <div class="playBT playNoglow">
+              <span style="font-size:23px">Play Now</span>
+              <span class="icon-arrow">▶</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script>
+        function removeWG() {
+          console.log("removeWG called");
+          var loader = document.querySelector("#loader");
+          if (loader) {
+            loader.remove();
+            console.log("loader removed");
+          }
+          var game = document.querySelector("#game");
+          if (game) {
+            game.style.display="block";
+            console.log("game displayed");
+          }
+          var embed = document.querySelector("#embed");
+          if (embed) {
+            embed.setAttribute("src", "game.html");
+            console.log("iframe src set to game.html");
+          }
+        }
+        
+        function loadGame() {
+          console.log("loadGame called");
+          removeWG();
+        }
+        
+        var playGameBtn = document.querySelector("#playGame");
+        if (playGameBtn) {
+          playGameBtn.addEventListener("click", loadGame);
+          console.log("click event listener added");
+        } else {
+          console.error("#playGame element not found");
+        }
+      </script>
+      <div class="gamebar">
+        <div class="gameopt">
+          <button type="button" aria-label="Show controls" id="pad" tooltip="Show controls">
+            <span>Controls</span>
+          </button>
+        </div>
+        <div class="gamesize">
+          <button type="button" aria-label="Fullscreen" class="resizing" tooltip="Fullscreen" id="full">
+            <span>Fullscreen</span>
+          </button>
+        </div>
+        <div class="gamerate">
+          <div class="gamescore">88%</div>
+        </div>
+      </div>
+    </div>
+    <div class="gameinfos border">
+      <div class="gameinfo">
+        <h1>Side Effects</h1>
+        <span class="gamemore">Developer: Hi Rohun - 84 226 plays</span>
+        <p id="desc" class="gamedesc">Side Effects is a strategy and horror game where you must take pills without poisoning yourself and use various items to survive longer than your opponent. You will experience intense moments of tension and thrills due to bizarre and intense situations. Inspired by Buckshot Roulette, the game emphasizes tactical gameplay to balance the randomness of different gameplay phases. Each turn, a variety of pills will be presented to you. Some may be beneficial, others harmful, and some even deadly. It is impossible to predict what you will ingest or the consequences it may have on your mind or body. Your character will have a poison resistance threshold that you must manage carefully. Between turns, you have the option to choose from a range of items and experimental treatments that could give you an advantage.<br />
+Side Effects offers a dark and frightening experience where you will need to demonstrate strategy and composure to progress as far as possible in the adventure!<br />
+<br />
+<u>Credits</u>:<br />
+<a href="https://hirohun.itch.io/" target="_blank">hi rohun</a> - <a href="https://mrpootsley.itch.io/" target="_blank">Mr.Pootsley</a> - <a href="https://jaybooty.itch.io/" target="_blank">Jaybooty</a><br />
+<br />
+If you like the game you can add it to your <a href="https://store.steampowered.com/app/3799100/Side_Effects/" target="_blank">wishlist</a> on Steam.</p>
+        <div class="gametags">
+          <a href="#">Strategy</a> <a href="#">Turn Based</a> <a href="#">Horror</a> <a href="#">3D</a> <a href="#">Halloween</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
