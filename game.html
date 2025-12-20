@@ -6,9 +6,6 @@
     <title>Unity Web Player | Roulette</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
-    <!-- 加载 Blob Storage 配置（如果存在） -->
-    <script src="blob-config.js" defer></script>
-
   </head>
   <body>
     <div id="unity-container">
@@ -23,6 +20,8 @@
       </div>
       <div id="unity-warning"> </div>
     </div>
+    <!-- 加载 Blob Storage 配置（同步加载，确保在 Unity 脚本之前执行） -->
+    <script src="blob-config.js"></script>
     <script>
       window.addEventListener("load", function () {
         if ("serviceWorker" in navigator) {
@@ -68,18 +67,24 @@
       // 如果使用 Blob Storage，直接使用完整 URL
       var loaderUrl, dataUrl, frameworkUrl, codeUrl;
       
+      console.log('[Game] BLOB_URLS available:', !!window.BLOB_URLS);
+      console.log('[Game] BLOB_BASE_URL:', window.BLOB_BASE_URL);
+      
       if (window.BLOB_URLS) {
         // 使用 Blob Storage URLs
         loaderUrl = window.BLOB_URLS["SideEffectsWebBuild_V0.2.loader.js"];
         dataUrl = window.BLOB_URLS["SideEffectsWebBuild_V0.2.data"];
         frameworkUrl = window.BLOB_URLS["SideEffectsWebBuild_V0.2.framework.js"];
         codeUrl = window.BLOB_URLS["SideEffectsWebBuild_V0.2.wasm"];
+        console.log('[Game] Using Blob Storage URLs');
+        console.log('[Game] Loader URL:', loaderUrl);
       } else {
         // 回退到本地路径
         loaderUrl = buildUrl + "/SideEffectsWebBuild_V0.2.loader.js";
         dataUrl = buildUrl + "/SideEffectsWebBuild_V0.2.data";
         frameworkUrl = buildUrl + "/SideEffectsWebBuild_V0.2.framework.js";
         codeUrl = buildUrl + "/SideEffectsWebBuild_V0.2.wasm";
+        console.log('[Game] Using local paths');
       }
       
       var config = {
@@ -111,12 +116,30 @@
 
       loadingBar.style.display = "block";
 
+      console.log('[Game] Starting Unity loader from:', loaderUrl);
+      console.log('[Game] Config:', config);
+
       var script = document.createElement("script");
       script.src = loaderUrl;
+      script.onerror = (error) => {
+        console.error('[Game] Failed to load Unity loader:', error);
+        unityShowBanner('Failed to load Unity loader. Please check the console for details.', 'error');
+        loadingBar.style.display = "none";
+      };
       script.onload = () => {
+        console.log('[Game] Unity loader script loaded successfully');
+        if (typeof createUnityInstance === 'undefined') {
+          console.error('[Game] createUnityInstance is not defined');
+          unityShowBanner('Unity loader failed to initialize. Please check the console.', 'error');
+          loadingBar.style.display = "none";
+          return;
+        }
+        console.log('[Game] Creating Unity instance...');
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
+          console.log('[Game] Loading progress:', (progress * 100).toFixed(1) + '%');
         }).then((unityInstance) => {
+          console.log('[Game] Unity instance created successfully');
           loadingBar.style.display = "none";
           
           // Function to hide the multiplayer and wishlist buttons
@@ -179,7 +202,9 @@
             clearInterval(buttonCheckInterval);
           }, 500); // Check every 500ms
         }).catch((message) => {
-          alert(message);
+          console.error('[Game] Unity instance creation failed:', message);
+          unityShowBanner('Failed to create Unity instance: ' + message, 'error');
+          loadingBar.style.display = "none";
         });
       };
       document.body.appendChild(script);

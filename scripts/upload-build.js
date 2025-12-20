@@ -1,16 +1,44 @@
 import { put } from '@vercel/blob';
-import { readFileSync, readdirSync, statSync } from 'fs';
+import { readFileSync, readdirSync, statSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// 读取 .env.local 文件
+function loadEnvFile() {
+  const envPath = join(__dirname, '..', '.env.local');
+  if (existsSync(envPath)) {
+    const envContent = readFileSync(envPath, 'utf-8');
+    const lines = envContent.split('\n');
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      if (trimmedLine && !trimmedLine.startsWith('#')) {
+        const [key, ...valueParts] = trimmedLine.split('=');
+        if (key && valueParts.length > 0) {
+          let value = valueParts.join('=').trim();
+          // 移除引号（如果有）
+          if ((value.startsWith('"') && value.endsWith('"')) || 
+              (value.startsWith("'") && value.endsWith("'"))) {
+            value = value.slice(1, -1);
+          }
+          process.env[key.trim()] = value;
+        }
+      }
+    }
+  }
+}
+
+// 加载 .env.local
+loadEnvFile();
+
 // 从环境变量获取 BLOB_READ_WRITE_TOKEN
 const token = process.env.BLOB_READ_WRITE_TOKEN;
 if (!token) {
   console.error('错误: 请设置环境变量 BLOB_READ_WRITE_TOKEN');
   console.log('你可以在 Vercel Dashboard > Storage > Blob Store > Settings 中找到这个 token');
+  console.log('或者在 .env.local 文件中设置: BLOB_READ_WRITE_TOKEN=你的token值');
   process.exit(1);
 }
 
@@ -101,9 +129,7 @@ async function main() {
     console.log(`  ${path}: ${url}`);
   });
   
-  // 生成 .env.local 示例
-  const baseUrl = Object.values(uploadedUrls)[0]?.replace(/\/[^\/]+$/, '') || '';
-  console.log(`\n请在 Vercel 项目设置中添加环境变量:`);
+  console.log(`\n请在 Vercel 项目设置中添加环境变量（可选）:`);
   console.log(`BLOB_BASE_URL=${baseUrl}`);
 }
 
