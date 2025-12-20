@@ -2,12 +2,8 @@
   "version": 2,
   "headers": [
     {
-      "source": "/(.*\\.(wasm|data|js))",
+      "source": "/(.*)",
       "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/octet-stream"
-        },
         {
           "key": "Cross-Origin-Embedder-Policy",
           "value": "require-corp"
