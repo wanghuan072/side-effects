@@ -18,3 +18,4 @@
   
   console.log('[Blob Config] Blob Storage URLs loaded:', Object.keys(window.BLOB_URLS).length, 'files');
 })();
+
